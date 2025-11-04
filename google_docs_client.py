@@ -69,7 +69,7 @@ class GoogleDocsClient:
                 selected_tab = None
                 if prefer_transcript and transcript_tab:
                     selected_tab = transcript_tab
-                    print(f'  → Using Transcript tab')
+                    print(f'  → Processing Transcript Tab')
                 elif notes_tab:
                     selected_tab = notes_tab
                     if transcript_tab:

@@ -3,7 +3,8 @@
 Newsletter Transcript Analyzer - AI Strategy & Innovation Content Generator
 
 Usage:
-  python cli.py                           # Interactive mode
+  python cli.py                           # Interactive mode (combined output by default)
+  python cli.py --separate-files          # Save each analysis to separate files
   python cli.py --email "Notes: Meeting"  # Analyze specific email by subject
   python cli.py --list                    # List all available emails
 """
@@ -109,6 +110,40 @@ def save_analysis(result, filename=None):
 
     console.print(f"[green]Analysis saved to: {filename}[/green]")
 
+def save_combined_analysis(results, filename=None):
+    """Save multiple analyses to a single combined file"""
+    # Filter out results with errors
+    valid_results = [r for r in results if 'error' not in r]
+
+    if not valid_results:
+        console.print("[red]No valid analyses to save.[/red]")
+        return
+
+    if not filename:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"analysis_combined_{timestamp}.md"
+
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write("# Combined Analysis Report\n\n")
+        f.write(f"**Generated:** {datetime.now().strftime('%B %d, %Y at %I:%M %p')}\n")
+        f.write(f"**Total Transcripts:** {len(valid_results)}\n\n")
+        f.write("---\n\n")
+
+        for idx, result in enumerate(valid_results, 1):
+            # Add section header for each transcript
+            f.write(f"# {idx}. {result['topic']}\n")
+            f.write(f"**Date:** {result['date']}\n\n")
+            f.write("---\n\n")
+            f.write(result['analysis'])
+            f.write("\n\n")
+
+            # Add separator between sections (except after the last one)
+            if idx < len(valid_results):
+                f.write("\n" + "="*80 + "\n\n")
+
+    console.print(f"[green]Combined analysis saved to: {filename}[/green]")
+    console.print(f"[green]Saved {len(valid_results)} transcript(s) to a single file[/green]")
+
 def get_start_date() -> str:
     """Prompt for start date if not in environment"""
     start_date = os.getenv('START_DATE', '').strip()
@@ -133,7 +168,7 @@ def get_start_date() -> str:
 
     return start_date
 
-def main_menu(label=None):
+def main_menu(label=None, separate_files=False):
     """Display the main menu and handle user interaction"""
     display_banner()
 
@@ -166,46 +201,81 @@ def main_menu(label=None):
             console.print("[bold cyan]Options:[/bold cyan]")
             console.print("  • Enter a number (1-{}) to analyze a specific transcript".format(len(transcripts)))
             console.print("  • Enter 'all' to analyze all transcripts")
+            console.print("  • Enter 'batch' to batch process all (skip display, auto-save)")
             console.print("  • Enter 'range' to analyze a range (e.g., 1-5)")
             console.print("  • Enter 'q' to quit\n")
 
             choice = Prompt.ask("What would you like to do?").strip().lower()
 
             if choice == 'q':
-                console.print("\n[bold blue]Thanks for using Qwilo! If you have improvement ideas, email stephen@synaptiq.ai[/bold blue]\n")
+                console.print("\n[bold blue]Thanks for using Qwilo. If you have improvement ideas, please email them to stephen@synaptiq.ai :)[/bold blue]\n")
                 break
 
             elif choice == 'all':
                 console.print(f"\n[bold]Analyzing {len(transcripts)} transcripts...[/bold]\n")
 
+                results = []
                 for idx, transcript in enumerate(transcripts, 1):
                     console.print(f"[cyan]Analyzing {idx}/{len(transcripts)}: {transcript['topic']}[/cyan]")
                     result = analyzer.analyze_transcript(transcript)
                     display_analysis(result)
-
-                    if Confirm.ask("Save this analysis?", default=True):
-                        save_analysis(result)
+                    results.append(result)
 
                     if idx < len(transcripts):
                         if not Confirm.ask("Continue to next transcript?", default=True):
                             break
+
+                # Save results - either combined or separate files
+                if results and Confirm.ask("Save analysis?", default=True):
+                    if separate_files:
+                        console.print("\n[cyan]Saving separate files...[/cyan]")
+                        for result in results:
+                            save_analysis(result)
+                    else:
+                        save_combined_analysis(results)
+
+            elif choice == 'batch':
+                console.print(f"\n[bold cyan]Batch Mode:[/bold cyan] Processing {len(transcripts)} transcripts...\n")
+
+                results = []
+                for idx, transcript in enumerate(transcripts, 1):
+                    console.print(f"[cyan]Analyzing {idx}/{len(transcripts)}: {transcript['topic']}[/cyan]")
+                    result = analyzer.analyze_transcript(transcript)
+                    results.append(result)
+
+                # Auto-save results
+                if results:
+                    if separate_files:
+                        console.print("\n[cyan]Saving separate files...[/cyan]")
+                        for result in results:
+                            save_analysis(result)
+                    else:
+                        save_combined_analysis(results)
 
             elif choice == 'range':
                 range_input = Prompt.ask("Enter range (e.g., 1-5)")
                 try:
                     start, end = map(int, range_input.split('-'))
                     if 1 <= start <= end <= len(transcripts):
+                        results = []
                         for idx in range(start - 1, end):
                             console.print(f"\n[cyan]Analyzing: {transcripts[idx]['topic']}[/cyan]")
                             result = analyzer.analyze_transcript(transcripts[idx])
                             display_analysis(result)
-
-                            if Confirm.ask("Save this analysis?", default=True):
-                                save_analysis(result)
+                            results.append(result)
 
                             if idx < end - 1:
                                 if not Confirm.ask("Continue to next transcript?", default=True):
                                     break
+
+                        # Save results - either combined or separate files
+                        if results and Confirm.ask("Save analysis?", default=True):
+                            if separate_files:
+                                console.print("\n[cyan]Saving separate files...[/cyan]")
+                                for result in results:
+                                    save_analysis(result)
+                            else:
+                                save_combined_analysis(results)
                     else:
                         console.print("[red]Invalid range. Please try again.[/red]")
                 except ValueError:
@@ -260,7 +330,7 @@ def list_emails_only(start_date=None, label=None):
     display_transcripts(transcripts)
 
 
-def analyze_specific_email(email_subject, start_date=None, label=None):
+def analyze_specific_email(email_subject, start_date=None, label=None, separate_files=False):
     """Analyze a specific email by subject line (supports partial matching)"""
     console.print("[bold]Connecting to Gmail...[/bold]")
     gmail = GmailClient(start_date=start_date, label=label)
@@ -294,19 +364,28 @@ def analyze_specific_email(email_subject, start_date=None, label=None):
 
         if choice.lower() == 'all':
             console.print(f"\n[bold]Analyzing all {len(matches)} matching transcripts...[/bold]\n")
+
             analyzer = ContentAnalyzer()
 
+            results = []
             for idx, transcript in enumerate(matches, 1):
                 console.print(f"[cyan]Analyzing {idx}/{len(matches)}: {transcript['topic']}[/cyan]")
                 result = analyzer.analyze_transcript(transcript)
                 display_analysis(result)
-
-                if Confirm.ask("Save this analysis?", default=True):
-                    save_analysis(result)
+                results.append(result)
 
                 if idx < len(matches):
                     if not Confirm.ask("Continue to next transcript?", default=True):
                         break
+
+            # Save results - either combined or separate files
+            if results and Confirm.ask("Save analysis?", default=True):
+                if separate_files:
+                    console.print("\n[cyan]Saving separate files...[/cyan]")
+                    for result in results:
+                        save_analysis(result)
+                else:
+                    save_combined_analysis(results)
             return
         else:
             try:
@@ -339,7 +418,8 @@ if __name__ == "__main__":
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python cli.py                           # Interactive mode
+  python cli.py                           # Interactive mode (combined output by default)
+  python cli.py --separate-files          # Interactive mode with separate files
   python cli.py --email "Notes: Meeting"  # Analyze specific email by subject
   python cli.py --email "Daily Sync"      # Partial match works too
   python cli.py --list                    # List all available emails
@@ -365,6 +445,11 @@ Examples:
         '--label',
         help='Filter emails by Gmail label (e.g., "AIQ", "Priority")'
     )
+    parser.add_argument(
+        '--separate-files',
+        action='store_true',
+        help='Save each analysis to a separate file (default: save all analyses to one combined file)'
+    )
 
     args = parser.parse_args()
 
@@ -372,6 +457,7 @@ Examples:
         # Get start date from args or environment
         start_date = args.start_date or os.getenv('START_DATE', '').strip()
         label = args.label
+        separate_files = args.separate_files
 
         if args.list:
             # List mode
@@ -381,12 +467,12 @@ Examples:
         elif args.email:
             # Direct email analysis mode
             display_banner()
-            analyze_specific_email(args.email, start_date, label)
+            analyze_specific_email(args.email, start_date, label, separate_files)
 
         else:
             # Interactive mode (default)
-            main_menu(label=label)
+            main_menu(label=label, separate_files=separate_files)
 
     except KeyboardInterrupt:
-        console.print("\n\n[bold blue]Thanks for using Qwilo! If you have improvement ideas, email stephen@synaptiq.ai[/bold blue]\n")
+        console.print("\n\n[bold blue]Thanks for using Qwilo. If you have improvement ideas, please email them to stephen@synaptiq.ai :)[/bold blue]\n")
         sys.exit(0)
