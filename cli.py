@@ -4,19 +4,19 @@ Newsletter Transcript Analyzer - AI Strategy & Innovation Content Generator
 
 Usage:
   # Gmail mode (default)
-  python cli.py                           # Interactive mode (test mode with Gemini 1.5 Flash)
+  python cli.py                           # Interactive mode (test mode, each topic in separate file)
+  python cli.py --combined-topics         # Save all topics from transcript in one file
   python cli.py --mode production         # Use production mode (GPT-4o)
   python cli.py --model gpt-4o-mini       # Use specific AI model (auto-detects provider)
   python cli.py --model claude-3-5-sonnet-20241022 --provider anthropic  # Specify model and provider
-  python cli.py --separate-files          # Save each analysis to separate files
   python cli.py --focus "custom topic"    # Override content focus
   python cli.py --email "Notes: Meeting"  # Analyze specific email by subject
   python cli.py --list                    # List all available emails
 
   # Drive mode
-  python cli.py --source drive            # Scan Google Drive folder (uses DRIVE_FOLDER_ID from .env)
+  python cli.py --source drive            # Scan Google Drive folder (each topic separate file)
+  python cli.py --source drive --combined-topics  # All topics in one file per transcript
   python cli.py --source drive --folder-id ABC123  # Use specific folder
-  python cli.py --source drive --separate-files    # Drive mode with separate output files
   python cli.py --source drive --mode production   # Drive mode with production AI model
   python cli.py --source drive --model gemini-1.5-pro  # Drive mode with custom model
 """
@@ -38,6 +38,42 @@ from dotenv import load_dotenv
 load_dotenv()
 
 console = Console()
+
+def parse_topics_from_analysis(analysis_text: str) -> list:
+    """Parse individual topics from analysis markdown text"""
+    import re
+
+    # Split on topic headers (## TOPIC N:)
+    topic_pattern = r'## TOPIC \d+:'
+    splits = re.split(topic_pattern, analysis_text)
+
+    # First split is before any topics (usually empty or intro text)
+    # Remaining splits are topic content
+    topics = []
+    topic_headers = re.findall(topic_pattern, analysis_text)
+
+    for i, (header, content) in enumerate(zip(topic_headers, splits[1:]), 1):
+        # Extract topic title from header
+        title_match = re.search(r'## TOPIC \d+: (.+)', header + content.split('\n')[0])
+        if title_match:
+            title = title_match.group(1).strip()
+        else:
+            title = f"Topic {i}"
+
+        # Clean content (remove the title line if it was captured)
+        lines = content.strip().split('\n')
+        if lines and lines[0].strip():
+            topic_content = header + ' ' + content
+        else:
+            topic_content = header + '\n' + content
+
+        topics.append({
+            'number': i,
+            'title': title,
+            'content': topic_content.strip()
+        })
+
+    return topics
 
 def display_banner():
     """Display the application banner with ASCII logo"""
@@ -104,29 +140,27 @@ def display_analysis(result):
     console.print(md)
     console.print("\n" + "="*80 + "\n")
 
-def save_analysis(result, save_local=False, docs_client=None):
-    """Save analysis to Google Docs (default) or local file"""
-    if 'error' in result:
-        console.print("[red]Cannot save analysis with errors.[/red]")
-        return
-
-    # Prepare content
+def save_topic(result, topic, topic_num, total_topics, save_local=False, docs_client=None):
+    """Save individual topic to Google Docs (default) or local file"""
+    # Prepare content for single topic
     content = f"# {result['topic']}\n"
-    content += f"**Date:** {result['date']}\n\n"
+    content += f"**Date:** {result['date']}\n"
+    content += f"**Topic {topic_num} of {total_topics}**\n\n"
     content += "---\n\n"
-    content += result['analysis']
+    content += topic['content']
 
     if save_local:
         # Save as local markdown file
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        safe_topic = "".join(c for c in result['topic'] if c.isalnum() or c in (' ', '-', '_')).strip()
-        safe_topic = safe_topic.replace(' ', '_')[:50]
-        filename = f"analysis_{safe_topic}_{timestamp}.md"
+        safe_title = "".join(c for c in topic['title'] if c.isalnum() or c in (' ', '-', '_')).strip()
+        safe_title = safe_title.replace(' ', '_')[:50]
+        filename = f"topic_{topic_num}_{safe_title}_{timestamp}.md"
 
         with open(filename, 'w', encoding='utf-8') as f:
             f.write(content)
 
-        console.print(f"[green]Analysis saved to: {filename}[/green]")
+        console.print(f"[green]Topic {topic_num} saved to: {filename}[/green]")
+        return filename
     else:
         # Save as Google Doc (default)
         if not docs_client:
@@ -136,8 +170,10 @@ def save_analysis(result, save_local=False, docs_client=None):
         if not output_folder_id:
             console.print("[yellow]Warning: OUTPUT_FOLDER_ID not set in .env. Document will be created in root Drive folder.[/yellow]")
 
-        # Document title is just MMDDYYYY
-        doc_title = datetime.now().strftime("%m%d%Y")
+        # Document title format: MMDDYYYY_Topic_N_TopicTitle
+        date_str = datetime.now().strftime("%m%d%Y")
+        safe_title = "".join(c for c in topic['title'] if c.isalnum() or c in (' ', '-', '_')).strip()[:40]
+        doc_title = f"{date_str}_Topic_{topic_num}_{safe_title}"
 
         doc_info = docs_client.create_document(
             title=doc_title,
@@ -146,10 +182,77 @@ def save_analysis(result, save_local=False, docs_client=None):
         )
 
         if doc_info:
-            console.print(f"[green]✓ Analysis saved to Google Doc: {doc_title}[/green]")
+            console.print(f"[green]✓ Topic {topic_num} saved to Google Doc: {doc_title}[/green]")
             console.print(f"[cyan]View at: {doc_info['url']}[/cyan]")
+            return doc_info['url']
         else:
-            console.print("[red]Failed to create Google Doc. Use --save-local flag to save as markdown instead.[/red]")
+            console.print(f"[red]Failed to create Google Doc for topic {topic_num}.[/red]")
+            return None
+
+def save_analysis(result, save_local=False, docs_client=None, combined_topics=False):
+    """Save analysis to Google Docs (default) or local file
+
+    Args:
+        result: Analysis result dictionary
+        save_local: Save as local markdown instead of Google Doc
+        docs_client: GoogleDocsClient instance (optional)
+        combined_topics: If True, save all topics in one file (old behavior).
+                        If False (default), save each topic separately
+    """
+    if 'error' in result:
+        console.print("[red]Cannot save analysis with errors.[/red]")
+        return
+
+    # Parse topics from analysis
+    topics = parse_topics_from_analysis(result['analysis'])
+
+    if not combined_topics and topics:
+        # NEW DEFAULT: Save each topic separately
+        console.print(f"[cyan]Saving {len(topics)} topics individually...[/cyan]")
+        for topic in topics:
+            save_topic(result, topic, topic['number'], len(topics), save_local, docs_client)
+    else:
+        # LEGACY: Save all topics combined in one file
+        # Prepare content
+        content = f"# {result['topic']}\n"
+        content += f"**Date:** {result['date']}\n\n"
+        content += "---\n\n"
+        content += result['analysis']
+
+        if save_local:
+            # Save as local markdown file
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            safe_topic = "".join(c for c in result['topic'] if c.isalnum() or c in (' ', '-', '_')).strip()
+            safe_topic = safe_topic.replace(' ', '_')[:50]
+            filename = f"analysis_{safe_topic}_{timestamp}.md"
+
+            with open(filename, 'w', encoding='utf-8') as f:
+                f.write(content)
+
+            console.print(f"[green]Combined analysis saved to: {filename}[/green]")
+        else:
+            # Save as Google Doc (default)
+            if not docs_client:
+                docs_client = GoogleDocsClient()
+
+            output_folder_id = os.getenv('OUTPUT_FOLDER_ID')
+            if not output_folder_id:
+                console.print("[yellow]Warning: OUTPUT_FOLDER_ID not set in .env. Document will be created in root Drive folder.[/yellow]")
+
+            # Document title is just MMDDYYYY
+            doc_title = datetime.now().strftime("%m%d%Y")
+
+            doc_info = docs_client.create_document(
+                title=doc_title,
+                content=content,
+                folder_id=output_folder_id
+            )
+
+            if doc_info:
+                console.print(f"[green]✓ Combined analysis saved to Google Doc: {doc_title}[/green]")
+                console.print(f"[cyan]View at: {doc_info['url']}[/cyan]")
+            else:
+                console.print("[red]Failed to create Google Doc. Use --save-local flag to save as markdown instead.[/red]")
 
 def save_combined_analysis(results, save_local=False, docs_client=None):
     """Save multiple analyses to a single combined Google Doc or file"""
@@ -237,7 +340,7 @@ def get_start_date() -> str:
 
     return start_date
 
-def main_menu_drive(folder_id=None, name_pattern=None, modified_after=None, separate_files=False, content_focus=None, save_local=False, mode='test', model_override=None, provider_override=None):
+def main_menu_drive(folder_id=None, name_pattern=None, modified_after=None, separate_files=False, combined_topics=False, content_focus=None, save_local=False, mode='test', model_override=None, provider_override=None):
     """Display the main menu and handle user interaction for Drive mode"""
     display_banner()
 
@@ -336,7 +439,7 @@ def main_menu_drive(folder_id=None, name_pattern=None, modified_after=None, sepa
                     if separate_files:
                         console.print("\n[cyan]Saving separate files...[/cyan]")
                         for result in results:
-                            save_analysis(result, save_local=save_local, docs_client=docs_client)
+                            save_analysis(result, save_local=save_local, docs_client=docs_client, combined_topics=combined_topics)
                     else:
                         save_combined_analysis(results, save_local=save_local, docs_client=docs_client)
 
@@ -354,7 +457,7 @@ def main_menu_drive(folder_id=None, name_pattern=None, modified_after=None, sepa
                     if separate_files:
                         console.print("\n[cyan]Saving separate files...[/cyan]")
                         for result in results:
-                            save_analysis(result, save_local=save_local, docs_client=docs_client)
+                            save_analysis(result, save_local=save_local, docs_client=docs_client, combined_topics=combined_topics)
                     else:
                         save_combined_analysis(results, save_local=save_local, docs_client=docs_client)
 
@@ -379,7 +482,7 @@ def main_menu_drive(folder_id=None, name_pattern=None, modified_after=None, sepa
                             if separate_files:
                                 console.print("\n[cyan]Saving separate files...[/cyan]")
                                 for result in results:
-                                    save_analysis(result, save_local=save_local, docs_client=docs_client)
+                                    save_analysis(result, save_local=save_local, docs_client=docs_client, combined_topics=combined_topics)
                             else:
                                 save_combined_analysis(results, save_local=save_local, docs_client=docs_client)
                     else:
@@ -397,7 +500,7 @@ def main_menu_drive(folder_id=None, name_pattern=None, modified_after=None, sepa
                     display_analysis(result)
 
                     if Confirm.ask("Save this analysis?", default=True):
-                        save_analysis(result)
+                        save_analysis(result, combined_topics=combined_topics)
                 else:
                     console.print("[red]Invalid number. Please try again.[/red]")
 
@@ -417,7 +520,7 @@ def main_menu_drive(folder_id=None, name_pattern=None, modified_after=None, sepa
         import traceback
         console.print(traceback.format_exc())
 
-def main_menu(label=None, separate_files=False, content_focus=None, save_local=False, mode='test', model_override=None, provider_override=None):
+def main_menu(label=None, separate_files=False, combined_topics=False, content_focus=None, save_local=False, mode='test', model_override=None, provider_override=None):
     """Display the main menu and handle user interaction"""
     display_banner()
 
@@ -489,7 +592,7 @@ def main_menu(label=None, separate_files=False, content_focus=None, save_local=F
                     if separate_files:
                         console.print("\n[cyan]Saving separate files...[/cyan]")
                         for result in results:
-                            save_analysis(result, save_local=save_local, docs_client=docs_client)
+                            save_analysis(result, save_local=save_local, docs_client=docs_client, combined_topics=combined_topics)
                     else:
                         save_combined_analysis(results, save_local=save_local, docs_client=docs_client)
 
@@ -507,7 +610,7 @@ def main_menu(label=None, separate_files=False, content_focus=None, save_local=F
                     if separate_files:
                         console.print("\n[cyan]Saving separate files...[/cyan]")
                         for result in results:
-                            save_analysis(result, save_local=save_local, docs_client=docs_client)
+                            save_analysis(result, save_local=save_local, docs_client=docs_client, combined_topics=combined_topics)
                     else:
                         save_combined_analysis(results, save_local=save_local, docs_client=docs_client)
 
@@ -532,7 +635,7 @@ def main_menu(label=None, separate_files=False, content_focus=None, save_local=F
                             if separate_files:
                                 console.print("\n[cyan]Saving separate files...[/cyan]")
                                 for result in results:
-                                    save_analysis(result, save_local=save_local, docs_client=docs_client)
+                                    save_analysis(result, save_local=save_local, docs_client=docs_client, combined_topics=combined_topics)
                             else:
                                 save_combined_analysis(results, save_local=save_local, docs_client=docs_client)
                     else:
@@ -550,7 +653,7 @@ def main_menu(label=None, separate_files=False, content_focus=None, save_local=F
                     display_analysis(result)
 
                     if Confirm.ask("Save this analysis?", default=True):
-                        save_analysis(result)
+                        save_analysis(result, combined_topics=combined_topics)
                 else:
                     console.print("[red]Invalid number. Please try again.[/red]")
 
@@ -589,7 +692,7 @@ def list_emails_only(start_date=None, label=None):
     display_transcripts(transcripts)
 
 
-def analyze_specific_email(email_subject, start_date=None, label=None, separate_files=False, content_focus=None, save_local=False, mode='test', model_override=None, provider_override=None):
+def analyze_specific_email(email_subject, start_date=None, label=None, separate_files=False, combined_topics=False, content_focus=None, save_local=False, mode='test', model_override=None, provider_override=None):
     """Analyze a specific email by subject line (supports partial matching)"""
     console.print("[bold]Connecting to Gmail...[/bold]")
     gmail = GmailClient(start_date=start_date, label=label)
@@ -652,7 +755,7 @@ def analyze_specific_email(email_subject, start_date=None, label=None, separate_
                 if separate_files:
                     console.print("\n[cyan]Saving separate files...[/cyan]")
                     for result in results:
-                        save_analysis(result)
+                        save_analysis(result, combined_topics=combined_topics)
                 else:
                     save_combined_analysis(results)
             return
@@ -678,7 +781,7 @@ def analyze_specific_email(email_subject, start_date=None, label=None, separate_
     display_analysis(result)
 
     if Confirm.ask("Save this analysis?", default=True):
-        save_analysis(result)
+        save_analysis(result, combined_topics=combined_topics)
 
 
 if __name__ == "__main__":
@@ -687,12 +790,12 @@ if __name__ == "__main__":
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python cli.py                           # Interactive mode (test mode, Gemini 1.5 Flash)
+  python cli.py                           # Interactive mode (each topic separate file)
+  python cli.py --combined-topics         # All topics in one file per transcript
   python cli.py --mode production         # Interactive mode (production mode, GPT-4o)
   python cli.py --model gpt-4o-mini       # Use specific model (auto-detects OpenAI)
   python cli.py --model claude-3-5-sonnet-20241022  # Use Claude Sonnet (auto-detects Anthropic)
   python cli.py --model gemini-1.5-pro --provider google  # Specify model and provider explicitly
-  python cli.py --separate-files          # Interactive mode with separate files
   python cli.py --focus "product management for SaaS"  # Custom content focus
   python cli.py --email "Notes: Meeting"  # Analyze specific email by subject
   python cli.py --email "Daily Sync"      # Partial match works too
@@ -700,9 +803,10 @@ Examples:
   python cli.py --list --start-date 10232025  # List emails from date onwards
   python cli.py --list --label "AIQ"      # List emails with label "AIQ"
   python cli.py --email "Meeting" --label "Priority"  # Analyze with label filter
-  python cli.py --focus "DevOps best practices" --separate-files  # Combine flags
+  python cli.py --focus "DevOps best practices" --combined-topics  # Combine flags
   python cli.py --source drive --mode production  # Drive mode with GPT-4o
   python cli.py --source drive --model claude-3-opus-20240229  # Drive mode with custom model
+  python cli.py --source drive --combined-topics  # Drive mode, combined topics per transcript
         """
     )
     parser.add_argument(
@@ -725,7 +829,12 @@ Examples:
     parser.add_argument(
         '--separate-files',
         action='store_true',
-        help='Save each analysis to a separate file (default: save all analyses to one combined file)'
+        help='Save each transcript analysis to a separate file (deprecated, per-topic saving is now default)'
+    )
+    parser.add_argument(
+        '--combined-topics',
+        action='store_true',
+        help='Save all topics from each transcript in one file (default: save each topic separately)'
     )
     parser.add_argument(
         '--save-local',
@@ -772,6 +881,7 @@ Examples:
         start_date = args.start_date or os.getenv('START_DATE', '').strip()
         label = args.label
         separate_files = args.separate_files
+        combined_topics = args.combined_topics  # Combine topics in one file
         content_focus = args.focus
         folder_id = args.folder_id  # For Drive mode
         save_local = args.save_local  # Save as markdown instead of Google Doc
@@ -790,6 +900,7 @@ Examples:
                 folder_id=folder_id,
                 modified_after=start_date,
                 separate_files=separate_files,
+                combined_topics=combined_topics,
                 content_focus=content_focus,
                 save_local=save_local,
                 mode=mode,
@@ -810,11 +921,11 @@ Examples:
             elif args.email:
                 # Direct email analysis mode
                 display_banner()
-                analyze_specific_email(args.email, start_date, label, separate_files, content_focus, save_local, mode, model_override, provider_override)
+                analyze_specific_email(args.email, start_date, label, separate_files, combined_topics, content_focus, save_local, mode, model_override, provider_override)
 
             else:
                 # Interactive mode (default)
-                main_menu(label=label, separate_files=separate_files, content_focus=content_focus, save_local=save_local, mode=mode, model_override=model_override, provider_override=provider_override)
+                main_menu(label=label, separate_files=separate_files, combined_topics=combined_topics, content_focus=content_focus, save_local=save_local, mode=mode, model_override=model_override, provider_override=provider_override)
 
     except KeyboardInterrupt:
         console.print("\n\n[bold blue]Thanks for using Qwilo. If you have improvement ideas, please email them to stephen@synaptiq.ai :)[/bold blue]\n")
