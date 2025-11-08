@@ -6,7 +6,7 @@ An interactive CLI tool that fetches Gemini conversation transcripts from Gmail 
 
 - **Dual Source Modes** - Fetch content from Gmail emails OR scan Google Drive folders
 - **Flexible AI Model Selection:**
-  - **Test Mode (default):** Fast and economical with Gemini 1.5 Flash
+  - **Test Mode (default):** Fast and economical with Gemini 2.5 Flash
   - **Production Mode:** High quality with GPT-4o
   - **Custom Models:** Override with any specific AI model (Claude, GPT, Gemini)
   - Supports OpenAI, Anthropic, and Google providers
@@ -106,7 +106,7 @@ pip install -r requirements.txt
 2. Edit `.env` and configure your AI provider:
    ```bash
    # ===== AI PROVIDER CONFIGURATION =====
-   # Note: The default mode is TEST (uses Gemini 1.5 Flash - FREE)
+   # Note: The default mode is TEST (uses Gemini 2.5 Flash - FREE)
    # You can override with --mode or --model command-line arguments
 
    # Choose: anthropic, openai, or google
@@ -121,8 +121,8 @@ pip install -r requirements.txt
 
    # Optional: Override default model (usually not needed)
    # Command-line --mode and --model arguments are recommended instead
-   # Defaults: gpt-4o-mini (openai), claude-3-5-haiku (anthropic), gemini-1.5-flash (google)
-   # AI_MODEL=gemini-1.5-flash
+   # Defaults: gpt-4o-mini (openai), claude-3-5-haiku (anthropic), gemini-2.5-flash (google)
+   # AI_MODEL=gemini-2.5-flash
 
    # Optional: Content focus for article generation
    # Default: AI strategy and innovation for business leaders
@@ -153,7 +153,7 @@ For a typical 12K-word transcript analysis:
 
 | Mode | Provider | Model | Cost per Analysis | Monthly Cost (100 analyses) | Notes |
 |------|----------|-------|-------------------|----------------------------|--------|
-| **Test (default)** | Google | gemini-1.5-flash | FREE | FREE | 1,500 requests/day free tier |
+| **Test (default)** | Google | gemini-2.5-flash | FREE | FREE | Generous free tier limits |
 | **Production** | OpenAI | gpt-4o | ~$0.10 | ~$10 | High quality, reasonable cost |
 | Custom | OpenAI | gpt-4o-mini | ~$0.005 | ~$0.50 | Best value, excellent quality |
 | Custom | OpenAI | gpt-4-turbo | ~$0.30 | ~$30 | Very high quality |
@@ -162,7 +162,7 @@ For a typical 12K-word transcript analysis:
 | Custom | Google | gemini-1.5-pro | ~$0.15 | ~$15 | Good quality, decent cost |
 
 **Recommendations:**
-- **For testing/development:** Use default **Test Mode** (Gemini 1.5 Flash) - completely free within generous limits
+- **For testing/development:** Use default **Test Mode** (Gemini 2.5 Flash) - completely free within generous limits
 - **For production:** Use **Production Mode** (GPT-4o) - excellent quality at reasonable cost
 - **For maximum value:** Use custom `--model gpt-4o-mini` - best cost/quality ratio
 - **For highest quality:** Use custom `--model claude-3-5-sonnet-20241022` - best analysis quality
@@ -209,7 +209,7 @@ Qwilo supports two source modes:
 
 **Gmail Mode (default):**
 ```bash
-python3 cli.py                    # Uses test mode (Gemini 1.5 Flash)
+python3 cli.py                    # Uses test mode (Gemini 2.5 Flash)
 python3 cli.py --mode production  # Uses production mode (GPT-4o)
 ```
 
@@ -231,7 +231,7 @@ The tool supports three ways to select AI models:
 
 **1. Test Mode (default) - Fast & Economical:**
 ```bash
-python3 cli.py                    # Uses Gemini 1.5 Flash
+python3 cli.py                    # Uses Gemini 2.5 Flash
 python3 cli.py --mode test        # Explicit test mode
 ```
 
@@ -260,7 +260,7 @@ python3 cli.py --email "Meeting" --model gpt-4o --separate-files
 
 - **OpenAI:** gpt-4o, gpt-4o-mini, gpt-4-turbo, gpt-3.5-turbo, o1-preview, o1-mini
 - **Anthropic:** claude-3-5-sonnet-20241022, claude-3-5-haiku-20241022, claude-3-opus-20240229
-- **Google:** gemini-1.5-flash, gemini-1.5-pro, gemini-2.0-flash-exp
+- **Google:** gemini-2.5-flash, gemini-2.5-pro, gemini-2.0-flash, gemini-1.5-flash, gemini-1.5-pro
 
 ### Gmail Mode Command-Line Options
 

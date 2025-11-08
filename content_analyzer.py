@@ -40,7 +40,7 @@ class ContentAnalyzer:
             self.model = 'gpt-4o'
         elif mode == 'test':
             self.provider = 'google'
-            self.model = 'gemini-1.5-flash'
+            self.model = 'gemini-2.5-flash'
         else:
             # Fallback to environment variables if mode is invalid
             self.provider = os.getenv('AI_PROVIDER', 'google').lower()
@@ -49,10 +49,10 @@ class ContentAnalyzer:
             default_models = {
                 'anthropic': 'claude-3-5-haiku-20241022',
                 'openai': 'gpt-4o-mini',
-                'google': 'gemini-1.5-flash'
+                'google': 'gemini-2.5-flash'
             }
 
-            self.model = os.getenv('AI_MODEL', default_models.get(self.provider, 'gemini-1.5-flash'))
+            self.model = os.getenv('AI_MODEL', default_models.get(self.provider, 'gemini-2.5-flash'))
 
         # Initialize the appropriate client
         self._init_client()
