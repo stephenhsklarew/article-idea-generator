@@ -781,7 +781,7 @@ def analyze_specific_email(email_subject, start_date=None, label=None, separate_
     display_analysis(result)
 
     if Confirm.ask("Save this analysis?", default=True):
-        save_analysis(result, combined_topics=combined_topics)
+        save_analysis(result, save_local=save_local, combined_topics=combined_topics)
 
 
 if __name__ == "__main__":
