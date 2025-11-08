@@ -1,0 +1,14 @@
+#!/bin/bash
+# Test script to run DocIdeaGenerator with specific email and local output
+
+echo "Running DocIdeaGenerator test..."
+echo "Email filter: Prashant/Stephen"
+echo "Output: Local markdown files"
+echo "Model: gemini-2.5-flash (Google - Free Tier)"
+echo ""
+
+# Use default test mode (Gemini 2.5 Flash) and pipe 'y' to confirm save
+echo "y" | python3 cli.py --email "Prashant/Stephen" --save-local
+
+echo ""
+echo "Test completed. Check current directory for generated .md files."
