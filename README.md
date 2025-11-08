@@ -30,8 +30,8 @@ An interactive CLI tool that fetches Gemini conversation transcripts from Gmail 
   - Compelling topic titles geared to target audience
   - 2-5 key insights specific to each topic
   - 1-3 notable verbatim quotes with speaker attribution
-  - Optional evidence/data and statistics when mentioned
-  - Optional real-world examples and case studies when shared
+  - Optional evidence/data (up to 5 items, 3-5 sentences each)
+  - Optional real-world examples (up to 5 items, 3-5 sentences each)
 - Batch processing support with combined or separate file output
 
 ## Prerequisites
@@ -468,13 +468,13 @@ Each analysis includes **2-5 topics**, with each topic containing:
 
 > **[Speaker Name]:** "[Third exact quote]"
 
-**Evidence/Data:** (Optional - when relevant data is mentioned)
-• [Specific statistic, data point, or research finding]
-• [Another piece of supporting evidence]
+**Evidence/Data:** (Optional - when relevant data is mentioned, max 5 items)
+• [Specific statistic, data point, or research finding - 3-5 sentences max]
+• [Another piece of supporting evidence - 3-5 sentences max]
 
-**Real-World Examples:** (Optional - when stories or examples are shared)
-• [Real-world story, case study, or example from the conversation]
-• [Another relevant example or perspective]
+**Real-World Examples:** (Optional - when stories or examples are shared, max 5 items)
+• [Real-world story, case study, or example from the conversation - 3-5 sentences max]
+• [Another relevant example or perspective - 3-5 sentences max]
 
 ---
 
@@ -487,8 +487,8 @@ Each analysis includes **2-5 topics**, with each topic containing:
 - **1-3 sentence description** explaining why this would make a good article
 - **2-5 key insights** specifically related to that topic
 - **1-3 notable quotes** with speaker attribution (verbatim from transcript)
-- **Evidence/Data** (optional) - statistics, research, or data points mentioned
-- **Real-World Examples** (optional) - stories, case studies, or perspectives shared
+- **Evidence/Data** (optional) - up to 5 items, each 3-5 sentences max
+- **Real-World Examples** (optional) - up to 5 items, each 3-5 sentences max
 
 ### Saved Files
 

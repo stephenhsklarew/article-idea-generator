@@ -163,13 +163,13 @@ Format your response EXACTLY as follows:
 
 > **[Speaker Name]:** "[Exact quote extracted verbatim from the transcript]"
 
-**Evidence/Data:** (Optional - include if relevant data or statistics are mentioned)
-• [Specific data point, statistic, or research finding mentioned in the conversation]
-• [Another piece of supporting evidence]
+**Evidence/Data:** (Optional - include if relevant data or statistics are mentioned, max 5 items)
+• [Specific data point, statistic, or research finding mentioned in the conversation - 3-5 sentences max]
+• [Another piece of supporting evidence - 3-5 sentences max]
 
-**Real-World Examples:** (Optional - include if stories or examples are shared)
-• [Real-world story, case study, or example from the conversation]
-• [Another relevant example or perspective]
+**Real-World Examples:** (Optional - include if stories or examples are shared, max 5 items)
+• [Real-world story, case study, or example from the conversation - 3-5 sentences max]
+• [Another relevant example or perspective - 3-5 sentences max]
 
 ---
 
@@ -185,11 +185,11 @@ Format your response EXACTLY as follows:
 **Notable Quotes:**
 > **[Speaker Name]:** "[Exact quote extracted verbatim from the transcript]"
 
-**Evidence/Data:** (Optional)
-• [Relevant data if mentioned]
+**Evidence/Data:** (Optional, max 5 items)
+• [Relevant data if mentioned - 3-5 sentences max]
 
-**Real-World Examples:** (Optional)
-• [Relevant example if mentioned]
+**Real-World Examples:** (Optional, max 5 items)
+• [Relevant example if mentioned - 3-5 sentences max]
 
 ---
 
@@ -198,7 +198,9 @@ Continue this format for all topics (2-5 total).
 NOTES:
 - Only include Evidence/Data and Real-World Examples sections when relevant information exists in the transcript
 - Include 2-5 insights per topic (use as many as are substantive and relevant)
-- Include 1-3 quotes per topic (more quotes when they strongly support the topic)"""
+- Include 1-3 quotes per topic (more quotes when they strongly support the topic)
+- Limit Evidence/Data items to max 5 per topic, each 3-5 sentences
+- Limit Real-World Examples to max 5 per topic, each 3-5 sentences"""
 
     def _call_anthropic(self, prompt: str) -> str:
         """Call Anthropic API"""
