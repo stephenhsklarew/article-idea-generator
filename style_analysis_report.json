@@ -1,0 +1,302 @@
+[
+  {
+    "title": "Why This Newsletter? And Why Now?",
+    "opening_paragraphs": [
+      "Why This Newsletter? And Why Now?",
+      "Every morning when I wake up, I find my inbox full of updates on new AI models, techniques, and tools. The headlines are loud; another breakthrough is just around the corner.",
+      "And yet, in my many conversations every day with senior business executives, product leaders, and operations teams, I hear something else entirely. It’s not panic or urgency as most would expect, but a quiet, persistent question: \u000b\u000bHow do we actually make use of this in a way that’s meaningful, ethical, secure, and legally compliant?"
+    ],
+    "closing_paragraphs": [
+      "SEO description: Practical strategic guidance & insights for business leaders to navigate AI: balancing value, risk, and ethical considerations.",
+      "Article URL: https://www.linkedin.com/pulse/why-newsletter-now-stephen-sklarew-t6u6c"
+    ],
+    "total_paragraphs": 24,
+    "total_sentences": 47,
+    "avg_paragraph_length": 30.0,
+    "min_paragraph_length": 2,
+    "max_paragraph_length": 70,
+    "avg_sentence_length": 15.382978723404255,
+    "questions_count": 0,
+    "sample_questions": [],
+    "bullet_points_count": 0,
+    "sample_bullets": [],
+    "bold_elements": [],
+    "transition_words_used": [],
+    "potential_section_headers": [
+      "Why This Newsletter? And Why Now?",
+      "Why Me?",
+      "#AIforBusiness #DigitalTransformation #AIstrategy #RaiseYourAIQ"
+    ],
+    "word_count": 720
+  },
+  {
+    "title": "AI Readiness: Are You Truly Prepared?",
+    "opening_paragraphs": [
+      "AI Readiness: Are You Truly Prepared?",
+      "Many business innovation leaders are all too eager to adopt AI.",
+      "They have problems to solve,"
+    ],
+    "closing_paragraphs": [
+      "SEO description: Assess your organizational AI readiness and avoid costly mistakes. Focus on an agile approach to AI strategy and data governance for success.",
+      "Article URL: https://www.linkedin.com/pulse/ai-readiness-you-truly-prepared-stephen-sklarew-wv86c"
+    ],
+    "total_paragraphs": 55,
+    "total_sentences": 60,
+    "avg_paragraph_length": 19.654545454545456,
+    "min_paragraph_length": 1,
+    "max_paragraph_length": 96,
+    "avg_sentence_length": 18.05,
+    "questions_count": 0,
+    "sample_questions": [],
+    "bullet_points_count": 3,
+    "sample_bullets": [
+      "----",
+      "----",
+      "---"
+    ],
+    "bold_elements": [],
+    "transition_words_used": [
+      "first",
+      "specifically",
+      "as a result"
+    ],
+    "potential_section_headers": [
+      "AI Readiness: Are You Truly Prepared?",
+      "They have problems to solve,",
+      "data to analyze, and",
+      "Avoid the Trap of Overly Complex Strategies",
+      "Embrace an Agile Approach",
+      "Stepping Back to Move Forward",
+      "The Bottom Line",
+      "----",
+      "Option 1:",
+      "#AI #Innovation #Strategy #DataGovernance"
+    ],
+    "word_count": 1081
+  },
+  {
+    "title": "A Business Leader's Playbook for AI Process Innovation",
+    "opening_paragraphs": [
+      "A Business Leader's Playbook for AI Process Innovation",
+      "AI applications span a wide spectrum: from basic decision tree systems to self-learning models and sophisticated multi-agent architectures capable of autonomous reasoning and task execution. And the technology continues to evolve practically every day.",
+      "But what can AI actually do to solve real business problems? The answer is more nuanced than you might expect: it can’t do much; at least not without human involvement."
+    ],
+    "closing_paragraphs": [
+      "👉 If it’s valuable, feel free to share it with your friends and colleagues.",
+      "#AIforBusiness #AIStrategy #DigitalTransformation #RaiseYourAIQ"
+    ],
+    "total_paragraphs": 155,
+    "total_sentences": 173,
+    "avg_paragraph_length": 21.148387096774194,
+    "min_paragraph_length": 1,
+    "max_paragraph_length": 100,
+    "avg_sentence_length": 18.953757225433527,
+    "questions_count": 0,
+    "sample_questions": [],
+    "bullet_points_count": 6,
+    "sample_bullets": [
+      "- Identify high-impact processes ready for AI transformation",
+      "- Prototype fast and scale with confidence",
+      "- Drive measurable efficiency and growth",
+      "- People-First Strategy: Start with human insight, not just tools",
+      "- Quantifiable Wins: Focus on outcomes that matter"
+    ],
+    "bold_elements": [],
+    "transition_words_used": [
+      "consequently",
+      "first",
+      "second",
+      "finally",
+      "ultimately",
+      "notably",
+      "importantly"
+    ],
+    "potential_section_headers": [
+      "A Business Leader's Playbook for AI Process Innovation",
+      "It Starts with People, then Process",
+      "AI Process Automation is Now",
+      "Identify a Process to Improve",
+      "Map the Current (“As-Is”) Process",
+      "Analyze for Inefficiencies",
+      "Design the Future State (“To-Be”)",
+      "Implement Changes",
+      "Monitor & Optimize",
+      "How to Prepare for AI-Enabled Automation"
+    ],
+    "word_count": 3278
+  },
+  {
+    "title": "The AI Cold Start Problem: Strategies for Business Leaders",
+    "opening_paragraphs": [
+      "The Cold Start Problem",
+      "Years ago, I was working for a company that launched a marketplace for corporate training courses. Each new customer required a tailored conversation with a company representative who would compile a personalized curriculum based on their needs. They were eager to implement a smart AI recommendation engine to reduce their workload so they could scale more efficiently. However, there was one glaring problem: they didn’t have a lot of customer data. Few records of purchase histories, company profiles, and marketplace browsing behavior. The AI engine was limited in its recommendations because there simply wasn’t enough data.",
+      "This experience culminated in one of the most important lessons I’ve learned in AI: the quantity and quality of your data is the ultimate limiting factor. No matter how good your AI models are, without plentiful and good data, they can’t do their job. Data is more than just fuel for AI; it’s the very foundation everything else is built on."
+    ],
+    "closing_paragraphs": [
+      "Don't let data scarcity slow down your digital transformation!",
+      "Read the full article for actionable steps. #DigitalTransformation #BusinessStrategy #RaiseYourAIQ #Innovation #ProductManagement"
+    ],
+    "total_paragraphs": 99,
+    "total_sentences": 158,
+    "avg_paragraph_length": 30.616161616161616,
+    "min_paragraph_length": 1,
+    "max_paragraph_length": 125,
+    "avg_sentence_length": 19.234177215189874,
+    "questions_count": 0,
+    "sample_questions": [],
+    "bullet_points_count": 0,
+    "sample_bullets": [],
+    "bold_elements": [],
+    "transition_words_used": [
+      "however",
+      "therefore",
+      "first",
+      "second",
+      "third",
+      "ultimately",
+      "for example"
+    ],
+    "potential_section_headers": [
+      "The Cold Start Problem",
+      "This, in essence, is the “cold start problem.”",
+      "Defining the Cold Start Problem",
+      "Why Senior Leaders Should Care",
+      "Framework for Overcoming Cold Start",
+      "Data Sourcing",
+      "Pros, Cons, and Ethical Considerations of Data Sourcing",
+      "Pros:",
+      "Cons:",
+      "Ethical Considerations:"
+    ],
+    "word_count": 3031
+  },
+  {
+    "title": "The Future of AI-Driven Software Modernization",
+    "opening_paragraphs": [
+      "The Future of Software Modernization: \u000bA Strategic Imperative for Business Leaders",
+      "For the past several years, my team and I have worked on a project modernizing a legacy disease management system for the State of Michigan’s public health department. Before our project began, the director of the State’s Health and Human Services (HHS) regularly struggled with the reality of a 20-year-old legacy system: poor user experience and system performance, aging infrastructure, and costly support and maintenance. This all came to a head in March 2020 with the onset of the global COVID-19 pandemic.",
+      "Shortly after the pandemic was declared, the HHS Director expanded his team in an effort to quickly get ahead of the outbreak. The legacy system couldn’t cope with increased user and data loads, and the surging number of volunteer users couldn’t figure out how to properly use it. Faced with rising demands and growing inefficiencies, he took the plunge and chose to modernize the system rather than continue paying for costly, patchwork upgrades, finally setting a course to retire what had become a classic Rube Goldberg machine."
+    ],
+    "closing_paragraphs": [
+      "Ready to reshape your organization's future? Read the full article and share it with others! 👇",
+      "#SoftwareModernization #BusinessTransformation #DigitalTransformation #RaiseYourAIQ"
+    ],
+    "total_paragraphs": 144,
+    "total_sentences": 229,
+    "avg_paragraph_length": 33.84722222222222,
+    "min_paragraph_length": 1,
+    "max_paragraph_length": 115,
+    "avg_sentence_length": 21.314410480349345,
+    "questions_count": 0,
+    "sample_questions": [],
+    "bullet_points_count": 0,
+    "sample_bullets": [],
+    "bold_elements": [],
+    "transition_words_used": [
+      "however",
+      "therefore",
+      "first",
+      "third",
+      "finally",
+      "ultimately",
+      "specifically"
+    ],
+    "potential_section_headers": [
+      "Why Modernization Can’t Wait",
+      "How Legacy Modernization Leads to Organizational Change",
+      "Why Do Traditional Modernization Approaches Fail?",
+      "How an AI-Driven Methodology Reimagines Modernization",
+      "Score",
+      "Definition",
+      "Explanation",
+      "3 - Established and Standardized",
+      "2 - Available and Applied",
+      "1 - Emerging Practice"
+    ],
+    "word_count": 4874
+  },
+  {
+    "title": "Convenience Over Perfection: The Competitive Advantage in GenAI Adoption",
+    "opening_paragraphs": [
+      "Convenience Over Perfection: The Competitive Advantage in GenAI Adoption",
+      "When I turned 50 back in 2023, I decided it was time to join the gym again. But this time I was determined not to repeat my old cycle: join a gym, get injured, quit soon after, then spend months struggling to cancel the membership.",
+      "This time, I picked a coworking space with a gym and a trainer to remove excuses. The trainer gave me a diet plan and a daily 1,800-calorie target—plus homework: log everything I ate for a week. Tracking meals turned out to be a hassle, even when using top apps like MyFitnessPal. In fact, I found the app clunkier than a pen and paper food journal. At the time, ChatGPT just launched custom GPTs with computer vision features, so I started experimenting."
+    ],
+    "closing_paragraphs": [
+      "What are your thoughts on \"convenience over perfection\" in AI adoption? Share below! 👇",
+      "#DigitalTransformation #GenAI #BusinessStrategy #RaiseYourAIQ"
+    ],
+    "total_paragraphs": 89,
+    "total_sentences": 109,
+    "avg_paragraph_length": 19.730337078651687,
+    "min_paragraph_length": 1,
+    "max_paragraph_length": 81,
+    "avg_sentence_length": 16.165137614678898,
+    "questions_count": 0,
+    "sample_questions": [],
+    "bullet_points_count": 0,
+    "sample_bullets": [],
+    "bold_elements": [],
+    "transition_words_used": [
+      "for example",
+      "in fact"
+    ],
+    "potential_section_headers": [
+      "The tradeoff that actually matters: convenience vs. perfection",
+      "There’s a spectrum in building solutions with GenAI:",
+      "Mental checklist for go/no-go decisions",
+      "Do you see sustained weekly active users?",
+      "Are failures clustering into patterns you can address?",
+      "Is there a regulated or mission-critical need surfacing?",
+      "Choose a workflow:",
+      "Build an MVP quickly:",
+      "Use it Yourself",
+      "Pilot with users:"
+    ],
+    "word_count": 1756
+  },
+  {
+    "title": "90% People, 10% Technology: Why AI Fails Without Change Management",
+    "opening_paragraphs": [
+      "90% People, 10% Technology: Why AI Fails Without Change Management",
+      "Contrary to popular perception, most AI failures don’t really look like crashes at all. They look like silence; the AI launches, the dashboards load, and the frontline keeps doing what they’ve always done.",
+      "Case in point, a manufacturing client of ours wanted a “quick fix” to a sales forecast the last vendor built but no one used. We urged meeting the people who rely on the forecast upfront; the response was “just improve the model.” Tests looked great: better features, cleaner data, lower error, yet adoption didn’t budge. After go‑live, the real issue surfaced: the user interface didn’t fit how revenue leaders prefer to review demand, controls felt foreign, and graphs lagged. The model wasn’t the blocker; lack of focus on the user experience was."
+    ],
+    "closing_paragraphs": [
+      "Share your insights and react below! 👇",
+      "#AIAdoption #ChangeManagement #BusinessLeadership"
+    ],
+    "total_paragraphs": 38,
+    "total_sentences": 69,
+    "avg_paragraph_length": 39.0,
+    "min_paragraph_length": 1,
+    "max_paragraph_length": 137,
+    "avg_sentence_length": 21.536231884057973,
+    "questions_count": 0,
+    "sample_questions": [],
+    "bullet_points_count": 4,
+    "sample_bullets": [
+      "-----",
+      "- Organizational Readiness is Key: Value from AI is a function of strategy, technical excellence, and organizational readiness. Without readiness, even elegant AI solutions fall flat.",
+      "- AI Needs a Different Playbook: Unlike traditional software, AI is a probabilistic copilot that changes how judgment is exercised. It requires continuous iteration, re-architecting decision flows, and building trust.",
+      "- Core Principles Make AI Stick: Executive alignment, early stakeholder engagement, building trust by design, reskilling (not just retraining), strategic communication, and continuous feedback loops are crucial for successful AI adoption."
+    ],
+    "bold_elements": [],
+    "transition_words_used": [
+      "first",
+      "second"
+    ],
+    "potential_section_headers": [
+      "The adoption gap: why AI fails",
+      "Why AI needs a different change playbook",
+      "Core principles that make AI stick",
+      "Conclusion",
+      "-----",
+      "Here's a LinkedIn post for your article:",
+      "My latest edition of #RaiseYourAIQ reveals why:",
+      "Share your insights and react below! 👇",
+      "#AIAdoption #ChangeManagement #BusinessLeadership"
+    ],
+    "word_count": 1482
+  }
+]
