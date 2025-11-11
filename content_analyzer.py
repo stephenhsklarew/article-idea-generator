@@ -1,8 +1,16 @@
 import os
+import sys
 from typing import Dict
 from dotenv import load_dotenv
+from pathlib import Path
 
 load_dotenv()
+
+# Add UnifiedLLMClient to path
+unified_llm_path = Path.home() / 'Development' / 'Scripts' / 'UnifiedLLMClient'
+sys.path.insert(0, str(unified_llm_path))
+
+from llm_client import get_client
 
 class ContentAnalyzer:
     def __init__(self, content_focus=None, mode='test', model_override=None, provider_override=None):
@@ -11,9 +19,9 @@ class ContentAnalyzer:
 
         Args:
             content_focus: Custom content focus string
-            mode: 'test' (uses Gemini 1.5 Flash) or 'production' (uses GPT-4o). Default: 'test'
+            mode: 'test' (uses Qwen 2.5 32B) or 'production' (uses Qwen 2.5 32B). Default: 'test'
             model_override: Specific model name to override mode defaults
-            provider_override: Specific provider to use with model_override ('anthropic', 'openai', or 'google')
+            provider_override: Specific provider to use with model_override ('qwen', 'anthropic', 'openai', or 'google')
         """
         # If model override is specified, use it with the provider
         if model_override:
@@ -24,37 +32,31 @@ class ContentAnalyzer:
                 self.provider = provider_override.lower()
             else:
                 # Auto-detect provider from model name
-                if 'claude' in model_override.lower():
-                    self.provider = 'anthropic'
+                if 'qwen' in model_override.lower():
+                    self.provider = 'qwen'
+                elif 'claude' in model_override.lower():
+                    self.provider = 'claude'
                 elif 'gpt' in model_override.lower() or 'o1' in model_override.lower():
                     self.provider = 'openai'
                 elif 'gemini' in model_override.lower():
                     self.provider = 'google'
                 else:
-                    # Default to environment variable
-                    self.provider = os.getenv('AI_PROVIDER', 'google').lower()
+                    # Default to Qwen (local, free)
+                    self.provider = 'qwen'
 
         # Mode-based configuration (only if no model override)
         elif mode == 'production':
-            self.provider = 'openai'
-            self.model = 'gpt-4o'
+            self.provider = 'qwen'
+            self.model = 'qwen2.5:32b'
         elif mode == 'test':
-            self.provider = 'google'
-            self.model = 'gemini-2.5-flash'
+            self.provider = 'qwen'
+            self.model = 'qwen2.5:32b'
         else:
-            # Fallback to environment variables if mode is invalid
-            self.provider = os.getenv('AI_PROVIDER', 'google').lower()
+            # Fallback to Qwen
+            self.provider = 'qwen'
+            self.model = 'qwen2.5:32b'
 
-            # Default models for each provider
-            default_models = {
-                'anthropic': 'claude-3-5-haiku-20241022',
-                'openai': 'gpt-4o-mini',
-                'google': 'gemini-2.5-flash'
-            }
-
-            self.model = os.getenv('AI_MODEL', default_models.get(self.provider, 'gemini-2.5-flash'))
-
-        # Initialize the appropriate client
+        # Initialize the unified LLM client
         self._init_client()
 
         # Load filter settings
@@ -69,31 +71,12 @@ class ContentAnalyzer:
                                'AI strategy and innovation for business leaders'
 
     def _init_client(self):
-        """Initialize the appropriate AI client based on provider"""
-        if self.provider == 'anthropic':
-            from anthropic import Anthropic
-            api_key = os.getenv('ANTHROPIC_API_KEY')
-            if not api_key:
-                raise ValueError("ANTHROPIC_API_KEY not found. Please set it in your .env file.")
-            self.client = Anthropic(api_key=api_key)
-
-        elif self.provider == 'openai':
-            from openai import OpenAI
-            api_key = os.getenv('OPENAI_API_KEY')
-            if not api_key:
-                raise ValueError("OPENAI_API_KEY not found. Please set it in your .env file.")
-            self.client = OpenAI(api_key=api_key)
-
-        elif self.provider == 'google':
-            import google.generativeai as genai
-            api_key = os.getenv('GOOGLE_API_KEY')
-            if not api_key:
-                raise ValueError("GOOGLE_API_KEY not found. Please set it in your .env file.")
-            genai.configure(api_key=api_key)
-            self.client = genai.GenerativeModel(self.model)
-
-        else:
-            raise ValueError(f"Unsupported AI provider: {self.provider}. Use 'anthropic', 'openai', or 'google'.")
+        """Initialize the unified LLM client"""
+        try:
+            # Use UnifiedLLMClient with explicit provider
+            self.client = get_client(provider=self.provider)
+        except Exception as e:
+            raise ValueError(f"Failed to initialize {self.provider} client: {str(e)}")
 
     def _parse_csv_env(self, env_var: str) -> list:
         """Parse comma-separated environment variable into list"""
@@ -202,33 +185,13 @@ NOTES:
 - Limit Evidence/Data items to max 5 per topic, each 3-5 sentences
 - Limit Real-World Examples to max 5 per topic, each 3-5 sentences"""
 
-    def _call_anthropic(self, prompt: str) -> str:
-        """Call Anthropic API"""
-        message = self.client.messages.create(
-            model=self.model,
-            max_tokens=4000,
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
-        )
-        return message.content[0].text
-
-    def _call_openai(self, prompt: str) -> str:
-        """Call OpenAI API"""
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
+    def _call_llm(self, prompt: str) -> str:
+        """Call LLM API via UnifiedLLMClient"""
+        return self.client.generate(
+            prompt=prompt,
             max_tokens=4000,
             temperature=0.7
         )
-        return response.choices[0].message.content
-
-    def _call_google(self, prompt: str) -> str:
-        """Call Google Gemini API"""
-        response = self.client.generate_content(prompt)
-        return response.text
 
     def analyze_transcript(self, transcript: Dict) -> Dict:
         """
@@ -240,15 +203,8 @@ NOTES:
         prompt = self._create_prompt(transcript)
 
         try:
-            # Call the appropriate provider
-            if self.provider == 'anthropic':
-                analysis = self._call_anthropic(prompt)
-            elif self.provider == 'openai':
-                analysis = self._call_openai(prompt)
-            elif self.provider == 'google':
-                analysis = self._call_google(prompt)
-            else:
-                raise ValueError(f"Unsupported provider: {self.provider}")
+            # Call the unified LLM client
+            analysis = self._call_llm(prompt)
 
             # Add source information to the analysis
             analysis_with_source = f"**Source:** {transcript['subject']}\n\n{analysis}"

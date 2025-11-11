@@ -4,10 +4,10 @@
 echo "Running DocIdeaGenerator test..."
 echo "Email filter: Prashant/Stephen"
 echo "Output: Local markdown files"
-echo "Model: gemini-2.5-flash (Google - Free Tier)"
+echo "Model: qwen2.5:32b (Qwen - Local, Free)"
 echo ""
 
-# Use default test mode (Gemini 2.5 Flash) and pipe 'y' to confirm save
+# Use default test mode (Qwen 2.5 32B) and pipe 'y' to confirm save
 echo "y" | python3 cli.py --email "Prashant/Stephen" --save-local
 
 echo ""

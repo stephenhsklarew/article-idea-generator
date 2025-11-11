@@ -6,7 +6,7 @@ Usage:
   # Gmail mode (default)
   python cli.py                           # Interactive mode (test mode, each topic in separate file)
   python cli.py --combined-topics         # Save all topics from transcript in one file
-  python cli.py --mode production         # Use production mode (GPT-4o)
+  python cli.py --mode production         # Use production mode (Qwen 2.5 32B)
   python cli.py --model gpt-4o-mini       # Use specific AI model (auto-detects provider)
   python cli.py --model claude-3-5-sonnet-20241022 --provider anthropic  # Specify model and provider
   python cli.py --focus "custom topic"    # Override content focus
@@ -361,7 +361,7 @@ def main_menu_drive(folder_id=None, name_pattern=None, modified_after=None, sepa
             if provider_override:
                 mode_display += f" (Provider: {provider_override})"
         else:
-            mode_display = "Test Mode (Gemini 1.5 Flash)" if mode == 'test' else "Production Mode (GPT-4o)"
+            mode_display = "Test Mode (Qwen 2.5 32B)" if mode == 'test' else "Production Mode (Qwen 2.5 32B)"
         console.print(f"[cyan]AI Mode: {mode_display}[/cyan]\n")
 
         console.print("[bold]Fetching documents...[/bold]")
@@ -542,7 +542,7 @@ def batch_process_all(start_date=None, label=None, separate_files=False, combine
             if provider_override:
                 mode_display += f" (Provider: {provider_override})"
         else:
-            mode_display = "Test Mode (Gemini 1.5 Flash)" if mode == 'test' else "Production Mode (GPT-4o)"
+            mode_display = "Test Mode (Qwen 2.5 32B)" if mode == 'test' else "Production Mode (Qwen 2.5 32B)"
         console.print(f"[cyan]AI Mode: {mode_display}[/cyan]\n")
 
         console.print("[bold]Fetching transcripts...[/bold]")
@@ -599,7 +599,7 @@ def main_menu(label=None, separate_files=False, combined_topics=False, content_f
             if provider_override:
                 mode_display += f" (Provider: {provider_override})"
         else:
-            mode_display = "Test Mode (Gemini 1.5 Flash)" if mode == 'test' else "Production Mode (GPT-4o)"
+            mode_display = "Test Mode (Qwen 2.5 32B)" if mode == 'test' else "Production Mode (Qwen 2.5 32B)"
         console.print(f"[cyan]AI Mode: {mode_display}[/cyan]\n")
 
         console.print("[bold]Fetching transcripts...[/bold]")
@@ -847,7 +847,7 @@ if __name__ == "__main__":
 Examples:
   python cli.py                           # Interactive mode (each topic separate file)
   python cli.py --combined-topics         # All topics in one file per transcript
-  python cli.py --mode production         # Interactive mode (production mode, GPT-4o)
+  python cli.py --mode production         # Interactive mode (production mode, Qwen 2.5 32B)
   python cli.py --model gpt-4o-mini       # Use specific model (auto-detects OpenAI)
   python cli.py --model claude-3-5-sonnet-20241022  # Use Claude Sonnet (auto-detects Anthropic)
   python cli.py --model gemini-1.5-pro --provider google  # Specify model and provider explicitly
@@ -859,7 +859,7 @@ Examples:
   python cli.py --list --label "AIQ"      # List emails with label "AIQ"
   python cli.py --email "Meeting" --label "Priority"  # Analyze with label filter
   python cli.py --focus "DevOps best practices" --combined-topics  # Combine flags
-  python cli.py --source drive --mode production  # Drive mode with GPT-4o
+  python cli.py --source drive --mode production  # Drive mode with Qwen 2.5 32B
   python cli.py --source drive --model claude-3-opus-20240229  # Drive mode with custom model
   python cli.py --source drive --combined-topics  # Drive mode, combined topics per transcript
         """
@@ -924,16 +924,16 @@ Examples:
         '--mode',
         choices=['test', 'production'],
         default='test',
-        help='AI mode: test (uses Gemini 1.5 Flash) or production (uses GPT-4o). Default: test'
+        help='AI mode: test (uses Qwen 2.5 32B) or production (uses Qwen 2.5 32B). Default: test'
     )
     parser.add_argument(
         '--model',
-        help='Override AI model (e.g., gpt-4o, claude-3-5-sonnet-20241022, gemini-1.5-pro). Overrides --mode setting.'
+        help='Override AI model (e.g., qwen2.5:32b, gpt-4o, claude-3-5-sonnet-20241022, gemini-1.5-pro). Overrides --mode setting.'
     )
     parser.add_argument(
         '--provider',
-        choices=['anthropic', 'openai', 'google'],
-        help='AI provider to use with --model (anthropic, openai, or google). Auto-detected if not specified.'
+        choices=['qwen', 'anthropic', 'openai', 'google'],
+        help='AI provider to use with --model (qwen, anthropic, openai, or google). Auto-detected if not specified.'
     )
 
     args = parser.parse_args()
