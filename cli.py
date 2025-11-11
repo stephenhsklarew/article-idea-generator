@@ -6,16 +6,19 @@ Usage:
   # Gmail mode (default)
   python cli.py                           # Interactive mode (test mode, each topic in separate file)
   python cli.py --combined-topics         # Save all topics from transcript in one file
+  python cli.py --fast                    # Use fast mode (Gemini 2.5 Flash, 300+ tok/s)
   python cli.py --mode production         # Use production mode (Qwen 2.5 32B)
   python cli.py --model gpt-4o-mini       # Use specific AI model (auto-detects provider)
   python cli.py --model claude-3-5-sonnet-20241022 --provider anthropic  # Specify model and provider
   python cli.py --focus "custom topic"    # Override content focus
   python cli.py --email "Notes: Meeting"  # Analyze specific email by subject
+  python cli.py --email "Meeting" --fast  # Analyze specific email with fast mode
   python cli.py --list                    # List all available emails
 
   # Drive mode
   python cli.py --source drive            # Scan Google Drive folder (each topic separate file)
   python cli.py --source drive --combined-topics  # All topics in one file per transcript
+  python cli.py --source drive --fast     # Drive mode with fast Gemini 2.5 Flash
   python cli.py --source drive --folder-id ABC123  # Use specific folder
   python cli.py --source drive --mode production   # Drive mode with production AI model
   python cli.py --source drive --model gemini-1.5-pro  # Drive mode with custom model
@@ -847,6 +850,7 @@ if __name__ == "__main__":
 Examples:
   python cli.py                           # Interactive mode (each topic separate file)
   python cli.py --combined-topics         # All topics in one file per transcript
+  python cli.py --fast                    # Use fast mode (Gemini 2.5 Flash, 300+ tok/s)
   python cli.py --mode production         # Interactive mode (production mode, Qwen 2.5 32B)
   python cli.py --model gpt-4o-mini       # Use specific model (auto-detects OpenAI)
   python cli.py --model claude-3-5-sonnet-20241022  # Use Claude Sonnet (auto-detects Anthropic)
@@ -854,12 +858,14 @@ Examples:
   python cli.py --focus "product management for SaaS"  # Custom content focus
   python cli.py --email "Notes: Meeting"  # Analyze specific email by subject
   python cli.py --email "Daily Sync"      # Partial match works too
+  python cli.py --email "Meeting" --fast  # Analyze specific email with fast mode
   python cli.py --list                    # List all available emails
   python cli.py --list --start-date 10232025  # List emails from date onwards
   python cli.py --list --label "AIQ"      # List emails with label "AIQ"
   python cli.py --email "Meeting" --label "Priority"  # Analyze with label filter
   python cli.py --focus "DevOps best practices" --combined-topics  # Combine flags
   python cli.py --source drive --mode production  # Drive mode with Qwen 2.5 32B
+  python cli.py --source drive --fast     # Drive mode with fast Gemini 2.5 Flash
   python cli.py --source drive --model claude-3-opus-20240229  # Drive mode with custom model
   python cli.py --source drive --combined-topics  # Drive mode, combined topics per transcript
         """
@@ -935,6 +941,11 @@ Examples:
         choices=['qwen', 'anthropic', 'openai', 'google'],
         help='AI provider to use with --model (qwen, anthropic, openai, or google). Auto-detected if not specified.'
     )
+    parser.add_argument(
+        '--fast',
+        action='store_true',
+        help='Use fast mode with Gemini 2.5 Flash for interactive sessions (300+ tok/s). Default uses Qwen 2.5 32B (free, local, ~11 tok/s).'
+    )
 
     args = parser.parse_args()
 
@@ -954,6 +965,11 @@ Examples:
         mode = args.mode  # AI mode: test or production
         model_override = args.model  # Specific model override
         provider_override = args.provider  # Specific provider override
+
+        # Handle fast mode - override model if --fast is specified and no explicit model given
+        if args.fast and not model_override:
+            model_override = 'gemini-2.5-flash'
+            provider_override = 'google'
 
         # Route to appropriate mode
         if source_mode == 'drive':
